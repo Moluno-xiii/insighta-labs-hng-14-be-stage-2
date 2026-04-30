@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { AppModule } from './app/app.module';
 import { GlobalExceptionFilter } from './globalExceptionFilter';
+import cookieParser from 'cookie-parser';
 
 function firstConstraint(errors: ValidationError[]): {
   name: string;
@@ -47,6 +48,9 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
+  const cookieSecret = process.env.COOKIE_SECRET;
+  if (!cookieSecret) throw new Error('COOKIE_SECRET is not set');
+  app.use(cookieParser(cookieSecret));
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

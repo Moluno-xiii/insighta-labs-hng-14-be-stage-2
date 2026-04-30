@@ -12,4 +12,6 @@ type APISuccessResponse<T> = {
   count?: number;
 };
 
-export type { GenderizeResponse, APISuccessResponse };
+type OAuthCookiePayload = { state: string; code_verifier: string };
+
+export type { GenderizeResponse, APISuccessResponse, OAuthCookiePayload };

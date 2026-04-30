@@ -1,0 +1,4 @@
+const OAUTH_COOKIE = 'gh_oauth';
+const OAUTH_COOKIE_MAX_AGE_MS = 10 * 60 * 1000;
+
+export { OAUTH_COOKIE, OAUTH_COOKIE_MAX_AGE_MS };
