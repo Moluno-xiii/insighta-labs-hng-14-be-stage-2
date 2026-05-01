@@ -16,7 +16,7 @@ type GithubUserResponse = {
   avatar_url: string;
   gravatar_id: string;
   url: string;
-  htnl_url: string;
+  html_url: string;
   followers_url: string;
   gists_url: string;
   starred_url: string;
@@ -28,10 +28,33 @@ type GithubUserResponse = {
   created_at: string;
   updated_at: string;
   notification_email: string;
+  email: string;
+};
+
+type User = {
+  id: string;
+  github_id: string;
+  username: string;
+  email: string;
+  avatar_url: string;
+  role: UserRoles;
+  is_active: boolean;
+  last_login_at: string;
+  created_at: string;
+};
+
+type UserRoles = 'admin' | 'analyst';
+
+type UserAuthToken = {
+  access_token: string;
+  refresh_token: string;
 };
 
 export type {
   Verifiers,
   GithubAccessTokenEndpointResponse,
   GithubUserResponse,
+  User,
+  UserRoles,
+  UserAuthToken,
 };

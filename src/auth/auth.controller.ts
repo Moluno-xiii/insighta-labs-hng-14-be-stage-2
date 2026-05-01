@@ -53,6 +53,7 @@ class AuthController {
     return await this.authService.exchangeCodeForToken(
       query.code,
       parsed.code_verifier,
+      res,
     );
   }
 

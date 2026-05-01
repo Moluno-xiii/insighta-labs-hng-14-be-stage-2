@@ -89,8 +89,10 @@ class Supabase {
     if (filters.country_id)
       query = query.ilike('country_id', filters.country_id);
     if (filters.age_group) query = query.ilike('age_group', filters.age_group);
-    if (filters.min_age !== undefined) query = query.gte('age', filters.min_age);
-    if (filters.max_age !== undefined) query = query.lte('age', filters.max_age);
+    if (filters.min_age !== undefined)
+      query = query.gte('age', filters.min_age);
+    if (filters.max_age !== undefined)
+      query = query.lte('age', filters.max_age);
     if (filters.min_gender_probability !== undefined)
       query = query.gte('gender_probability', filters.min_gender_probability);
     if (filters.min_country_probability !== undefined)

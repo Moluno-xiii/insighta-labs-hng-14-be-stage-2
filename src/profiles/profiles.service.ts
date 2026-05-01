@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Supabase from 'src/supabase/supabase';
+import Supabase from 'src/supabase/queryProfile';
 import { APISuccessResponse, GenderizeResponse } from 'src/types';
 import { customTryCatch } from 'src/utils';
 import { getCountryName } from './countries';
