@@ -50,6 +50,11 @@ type UserAuthToken = {
   refresh_token: string;
 };
 
+type AuthTokenPayload = {
+  id: string;
+  role: UserRoles;
+};
+
 export type {
   Verifiers,
   GithubAccessTokenEndpointResponse,
@@ -57,4 +62,5 @@ export type {
   User,
   UserRoles,
   UserAuthToken,
+  AuthTokenPayload,
 };

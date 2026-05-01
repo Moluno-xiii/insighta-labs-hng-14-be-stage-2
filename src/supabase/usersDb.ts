@@ -1,6 +1,7 @@
 import { PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
 import { User } from 'src/auth/auth.types';
 import { getSupabaseClient } from './supabaseClient';
+import { HttpException } from '@nestjs/common';
 
 class SupabaseUsers {
   private readonly client: SupabaseClient;
@@ -22,8 +23,15 @@ class SupabaseUsers {
     return data;
   };
 
+  getUserById = async (userId: string) => {
+    const data = this.queryUsers<User>(
+      await this.client.from(this.tableName).select().eq('id', userId).single(),
+    );
+    return data;
+  };
+
   private queryUsers = <T>(result: PostgrestSingleResponse<T>) => {
-    if (result.error) throw result.error;
+    if (result.error) throw new HttpException(result.error.message, 500);
     return result.data;
   };
 }

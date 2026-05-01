@@ -46,7 +46,8 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.enableCors({
-    origin: '*',
+    origin: 'http://localhost:3000',
+    credentials: true,
   });
   const cookieSecret = process.env.COOKIE_SECRET;
   if (!cookieSecret) throw new Error('COOKIE_SECRET is not set');

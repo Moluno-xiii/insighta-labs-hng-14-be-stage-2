@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes, randomUUID } from 'crypto';
 import { buildQuery, customTryCatch } from 'src/utils';
 import {
+  AuthTokenPayload,
   GithubAccessTokenEndpointResponse,
   GithubUserResponse,
   User,
@@ -14,7 +15,7 @@ import auth_endpoints from './endpoints';
 import SupabaseUsers from 'src/supabase/usersDb';
 import { uuidv7 } from 'uuidv7';
 import jwt from 'jsonwebtoken';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 
 @Injectable()
 class AuthService {
@@ -82,6 +83,47 @@ class AuthService {
     await this.handleUser(data.access_token, res);
   };
 
+  refreshTokens = async (req: Request, res: Response) => {
+    const refresh_token: string | undefined = req.cookies?.refresh_token as
+      | string
+      | undefined;
+    if (!refresh_token) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const decodedToken = this.verifyToken(
+      refresh_token,
+      this.refresh_token_secret,
+    );
+
+    const isUserActive = await this.checkUserACtiveStatus(decodedToken.id);
+    if (isUserActive) {
+      throw new UnauthorizedException('User is not active');
+    }
+
+    const tokens = this.issueTokens({
+      id: decodedToken.id,
+      role: decodedToken.role,
+    });
+    this.setAuthCookies(tokens, res);
+    return {
+      status: 'success',
+      refresh_token: tokens.refresh_token,
+      access_token: tokens.access_token,
+    };
+  };
+
+  private verifyToken = (token: string, secret: string) => {
+    try {
+      const decoded = jwt.verify(token, secret, {
+        algorithms: ['HS256'],
+      }) as AuthTokenPayload;
+      return decoded;
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  };
+
   private handleUser = async (
     access_token: string,
     res: Response,
@@ -107,8 +149,11 @@ class AuthService {
     });
     this.setAuthCookies(userTokens, res);
     res.redirect(this.frontend_url);
-    console.log('user tokens, \n', userTokens);
-    console.log('user data, \n', userData);
+  };
+
+  private checkUserACtiveStatus = async (userId: string): Promise<boolean> => {
+    const user = await this.db.getUserById(userId);
+    return user.is_active;
   };
 
   private setAuthCookies = (tokens: UserAuthToken, res: Response): void => {
@@ -132,7 +177,7 @@ class AuthService {
       expiresIn: '3m',
     });
     const refresh_token = jwt.sign(payload, this.refresh_token_secret, {
-      expiresIn: '5m',
+      expiresIn: '5d',
     });
     return {
       access_token,
@@ -163,3 +208,9 @@ class AuthService {
 }
 
 export default AuthService;
+
+// req.user empty
+// throw error on validate tokens
+// check for tokens
+// rotate refresh tokens
+// different origin with frontend

@@ -58,8 +58,8 @@ class AuthController {
   }
 
   @Post('refresh')
-  refreshToken() {
-    return { message: 'refresh token endpoint' };
+  refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    return this.authService.refreshTokens(req, res);
   }
 
   @Post('logout')
